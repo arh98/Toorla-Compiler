@@ -7,14 +7,16 @@ import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 public class ProgramPrinter implements ToorlaListener {
+    int indent;
     @Override
     public void enterProgram(ToorlaParser.ProgramContext ctx) {
-        System.out.println(ctx.getText());
+//        indent++;
+        System.out.println("Program Start{");
     }
 
     @Override
     public void exitProgram(ToorlaParser.ProgramContext ctx) {
-
+        System.out.println("}");
     }
 
     @Override
