@@ -8,9 +8,9 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 
 public class ProgramPrinter implements ToorlaListener {
     int indent;
+    boolean entry;
     @Override
     public void enterProgram(ToorlaParser.ProgramContext ctx) {
-//        indent++;
         System.out.println("Program Start{");
     }
 
@@ -21,27 +21,32 @@ public class ProgramPrinter implements ToorlaListener {
 
     @Override
     public void enterClassDeclaration(ToorlaParser.ClassDeclarationContext ctx) {
-
+        if(ctx.classParent != null) {
+            System.out.println("Class : " + ctx.className.getText() + " / Class Parent : " + ctx.classParent.getText() + " / IsEntery : " + entry + " {");
+        }else{
+            System.out.println("Class : " + ctx.className.getText() + " / IsEntery : " + entry + " {");
+        }
     }
 
     @Override
     public void exitClassDeclaration(ToorlaParser.ClassDeclarationContext ctx) {
-
+        System.out.println("}");
     }
 
     @Override
     public void enterEntryClassDeclaration(ToorlaParser.EntryClassDeclarationContext ctx) {
-
+        System.out.println("main");
+        entry=true;
     }
 
     @Override
     public void exitEntryClassDeclaration(ToorlaParser.EntryClassDeclarationContext ctx) {
-
+        entry=false;
     }
 
     @Override
     public void enterFieldDeclaration(ToorlaParser.FieldDeclarationContext ctx) {
-
+        System.out.println("Field : " + ctx.fieldName.getText()+ " / Type : " + ctx.fieldType.getText());
     }
 
     @Override
@@ -51,7 +56,7 @@ public class ProgramPrinter implements ToorlaListener {
 
     @Override
     public void enterAccess_modifier(ToorlaParser.Access_modifierContext ctx) {
-
+//        System.out.println("public");
     }
 
     @Override
