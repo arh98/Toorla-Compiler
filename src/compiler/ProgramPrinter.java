@@ -7,11 +7,13 @@ import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 public class ProgramPrinter implements ToorlaListener {
-    int indent;
+    String TAB = "\t";
+    static int indents = 0;
     boolean entry;
     @Override
     public void enterProgram(ToorlaParser.ProgramContext ctx) {
         System.out.println("Program Start{");
+        indents++;
     }
 
     @Override
@@ -21,32 +23,53 @@ public class ProgramPrinter implements ToorlaListener {
 
     @Override
     public void enterClassDeclaration(ToorlaParser.ClassDeclarationContext ctx) {
+        for (int i = 0; i < indents; i++) {
+            System.out.print(TAB);
+        }
         if(ctx.classParent != null) {
             System.out.println("Class : " + ctx.className.getText() + " / Class Parent : " + ctx.classParent.getText() + " / IsEntery : " + entry + " {");
+            indents++;
         }else{
-            System.out.println("Class : " + ctx.className.getText() + " / IsEntery : " + entry + " {");
+            if(entry){
+                System.out.println("main Class : " + ctx.className.getText() + " / IsEntery : " + entry + " {");
+                indents++;
+            }
+            else{
+                System.out.println("Class : " + ctx.className.getText() + " / IsEntery : " + entry + " {");
+                indents++;
+            }
         }
     }
 
     @Override
     public void exitClassDeclaration(ToorlaParser.ClassDeclarationContext ctx) {
+        for (int i = 0; i < indents-1; i++) {
+            System.out.print(TAB);
+        }
         System.out.println("}");
+        indents--;
     }
 
     @Override
     public void enterEntryClassDeclaration(ToorlaParser.EntryClassDeclarationContext ctx) {
-        System.out.println("main");
         entry=true;
     }
 
     @Override
     public void exitEntryClassDeclaration(ToorlaParser.EntryClassDeclarationContext ctx) {
+//        for (int i = 0; i < indents-1; i++) {
+//            System.out.print(TAB);
+//        }
         entry=false;
     }
 
     @Override
     public void enterFieldDeclaration(ToorlaParser.FieldDeclarationContext ctx) {
-        System.out.println("Field : " + ctx.fieldName.getText()+ " / Type : " + ctx.fieldType.getText());
+//        System.out.println("Testing ::: " + ctx.ID().size());
+            for (int i = 0; i < indents; i++) {
+                System.out.print(TAB);
+            }
+        System.out.println("field : " + ctx.fieldName.getText()+ " / type : " + ctx.fieldType.getText() + " / "+ctx.access_modifier().getText());
     }
 
     @Override
@@ -66,12 +89,26 @@ public class ProgramPrinter implements ToorlaListener {
 
     @Override
     public void enterMethodDeclaration(ToorlaParser.MethodDeclarationContext ctx) {
-
+        for (int i = 0; i < indents; i++) {
+            System.out.print(TAB);
+        }
+        if(!entry){
+            System.out.println("class method : " + ctx.methodName.getText() + " / return type : " + ctx.t.getText() + " / type : "+ ctx.methodAccessModifier.getText() + "{" );
+            indents++;
+        }
+        else{
+            System.out.println(ctx.methodName.getText() + " method" + " / return type : " + ctx.t.getText() + "{" );
+            indents++;
+        }
     }
 
     @Override
     public void exitMethodDeclaration(ToorlaParser.MethodDeclarationContext ctx) {
-
+        for (int i = 0; i < indents-1; i++) {
+            System.out.print(TAB);
+        }
+        System.out.println("}");
+        indents--;
     }
 
     @Override
@@ -126,7 +163,15 @@ public class ProgramPrinter implements ToorlaListener {
 
     @Override
     public void enterStatementVarDef(ToorlaParser.StatementVarDefContext ctx) {
+        for (int i = 0; i < ctx.ID().size() ; i++) {
+            for (int j = 0; j < indents ; j++) {
+                System.out.print(TAB);
+            }
+            System.out.println("field : "+ctx.ID().get(i).getText() + " / type : local var");
+//            if(ctx.ID().get(i).)
+//            System.out.println("field : "+ctx.i1.getText() + " / type : " + ctx.e1.getText());
 
+        }
     }
 
     @Override

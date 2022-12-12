@@ -12,7 +12,7 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 public class Compiler {
     public static void main(String[] args){
         try{
-            CharStream stream = CharStreams.fromFileName("./sample/test.tl");
+            CharStream stream = CharStreams.fromFileName("./sample/test3.tl");
             ToorlaLexer lexer = new ToorlaLexer(stream);
             TokenStream tokens = new CommonTokenStream(lexer);
             ToorlaParser parser = new ToorlaParser(tokens);
