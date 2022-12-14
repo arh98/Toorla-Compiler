@@ -70,7 +70,6 @@ openStatement :
     | conditionalStat=openConditional
     ;
 
-
 statement:
 	s1 = closedStatement
 	| s2 = openStatement

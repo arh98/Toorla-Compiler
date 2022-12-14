@@ -5,15 +5,15 @@ import gen.ToorlaParser;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
-
 public class ProgramPrinter implements ToorlaListener {
-    String TAB = "\t";
-    static int indents = 0;
-    boolean entry;
+    public String TAB = "    ";
+    public static int Indent = 0;
+    public boolean Entry;
+    public String ConstructorName;
     @Override
     public void enterProgram(ToorlaParser.ProgramContext ctx) {
         System.out.println("Program Start{");
-        indents++;
+        Indent++;
     }
 
     @Override
@@ -23,50 +23,45 @@ public class ProgramPrinter implements ToorlaListener {
 
     @Override
     public void enterClassDeclaration(ToorlaParser.ClassDeclarationContext ctx) {
-        for (int i = 0; i < indents; i++) {
+        ConstructorName = ctx.className.getText();
+        for (int i = 0; i < Indent; i++) {
             System.out.print(TAB);
         }
         if(ctx.classParent != null) {
-            System.out.println("Class : " + ctx.className.getText() + " / Class Parent : " + ctx.classParent.getText() + " / IsEntery : " + entry + " {");
-            indents++;
+            System.out.println("Class : " + ctx.className.getText() + " / Class Parent : " + ctx.classParent.getText() + " / IsEntery : " + Entry + " {");
         }else{
-            if(entry){
-                System.out.println("main Class : " + ctx.className.getText() + " / IsEntery : " + entry + " {");
-                indents++;
+            if(Entry){
+                System.out.println("main Class : " + ctx.className.getText() + " / IsEntery : " + Entry + " {");
             }
             else{
-                System.out.println("Class : " + ctx.className.getText() + " / IsEntery : " + entry + " {");
-                indents++;
+                System.out.println("Class : " + ctx.className.getText() + " / IsEntery : " + Entry + " {");
             }
         }
+        Indent++;
     }
 
     @Override
     public void exitClassDeclaration(ToorlaParser.ClassDeclarationContext ctx) {
-        for (int i = 0; i < indents-1; i++) {
+        for (int i = 0; i < Indent -1; i++) {
             System.out.print(TAB);
         }
         System.out.println("}");
-        indents--;
+        Indent--;
     }
 
     @Override
     public void enterEntryClassDeclaration(ToorlaParser.EntryClassDeclarationContext ctx) {
-        entry=true;
+        Entry =true;
     }
 
     @Override
     public void exitEntryClassDeclaration(ToorlaParser.EntryClassDeclarationContext ctx) {
-//        for (int i = 0; i < indents-1; i++) {
-//            System.out.print(TAB);
-//        }
-        entry=false;
+        Entry =false;
     }
 
     @Override
     public void enterFieldDeclaration(ToorlaParser.FieldDeclarationContext ctx) {
-//        System.out.println("Testing ::: " + ctx.ID().size());
-            for (int i = 0; i < indents; i++) {
+            for (int i = 0; i < Indent; i++) {
                 System.out.print(TAB);
             }
         System.out.println("field : " + ctx.fieldName.getText()+ " / type : " + ctx.fieldType.getText() + " / "+ctx.access_modifier().getText());
@@ -74,41 +69,47 @@ public class ProgramPrinter implements ToorlaListener {
 
     @Override
     public void exitFieldDeclaration(ToorlaParser.FieldDeclarationContext ctx) {
-
     }
 
     @Override
     public void enterAccess_modifier(ToorlaParser.Access_modifierContext ctx) {
-//        System.out.println("public");
     }
 
     @Override
     public void exitAccess_modifier(ToorlaParser.Access_modifierContext ctx) {
-
     }
 
     @Override
     public void enterMethodDeclaration(ToorlaParser.MethodDeclarationContext ctx) {
-        for (int i = 0; i < indents; i++) {
+        for (int i = 0; i < Indent; i++) {
             System.out.print(TAB);
         }
-        if(!entry){
-            System.out.println("class method : " + ctx.methodName.getText() + " / return type : " + ctx.t.getText() + " / type : "+ ctx.methodAccessModifier.getText() + "{" );
-            indents++;
+        if(!Entry){
+            if(ctx.methodName.getText().equals(ConstructorName)){
+                System.out.println("class constructor : " + ctx.methodName.getText() + " / return type : " + ctx.t.getText() + " / type : "+ ctx.methodAccessModifier.getText() + " {" );
+                System.out.println(TAB+TAB+TAB+"parameters list : []");
+            }else{
+                String args = "parameters list : ["+ "type : " + ctx.typeP1.getText() +" / name : " + ctx.param1.getText();
+                if(ctx.param2!=null){
+                    args = args.concat(", type : " + ctx.typeP2.getText() +" / name : " + ctx.param2.getText());
+                }
+                System.out.println("class method : " + ctx.methodName.getText() + " / return type : " + ctx.t.getText() + " / type : "+ ctx.methodAccessModifier.getText() + " {" );
+                System.out.println(TAB+TAB+TAB+args+"]");
+            }
         }
         else{
             System.out.println(ctx.methodName.getText() + " method" + " / return type : " + ctx.t.getText() + "{" );
-            indents++;
         }
+        Indent++;
     }
 
     @Override
     public void exitMethodDeclaration(ToorlaParser.MethodDeclarationContext ctx) {
-        for (int i = 0; i < indents-1; i++) {
+        for (int i = 0; i < Indent -1; i++) {
             System.out.print(TAB);
         }
         System.out.println("}");
-        indents--;
+        Indent--;
     }
 
     @Override
@@ -123,7 +124,6 @@ public class ProgramPrinter implements ToorlaListener {
 
     @Override
     public void enterClosedConditional(ToorlaParser.ClosedConditionalContext ctx) {
-
     }
 
     @Override
@@ -133,7 +133,16 @@ public class ProgramPrinter implements ToorlaListener {
 
     @Override
     public void enterOpenConditional(ToorlaParser.OpenConditionalContext ctx) {
+        ParserRuleContext parent = ctx.getParent();
+        if ((
+                parent instanceof ToorlaParser.OpenStatementContext
+                        || parent instanceof ToorlaParser.ClosedStatementContext
+                        || parent instanceof ToorlaParser.ClosedConditionalContext
+                        || parent instanceof ToorlaParser.StatementClosedLoopContext
+        )){
+            System.out.print(TAB + TAB + TAB + "nested statement{}\n");
 
+        }
     }
 
     @Override
@@ -164,13 +173,10 @@ public class ProgramPrinter implements ToorlaListener {
     @Override
     public void enterStatementVarDef(ToorlaParser.StatementVarDefContext ctx) {
         for (int i = 0; i < ctx.ID().size() ; i++) {
-            for (int j = 0; j < indents ; j++) {
+            for (int j = 0; j < Indent; j++) {
                 System.out.print(TAB);
             }
             System.out.println("field : "+ctx.ID().get(i).getText() + " / type : local var");
-//            if(ctx.ID().get(i).)
-//            System.out.println("field : "+ctx.i1.getText() + " / type : " + ctx.e1.getText());
-
         }
     }
 
@@ -221,7 +227,16 @@ public class ProgramPrinter implements ToorlaListener {
 
     @Override
     public void enterStatementClosedLoop(ToorlaParser.StatementClosedLoopContext ctx) {
-
+//        System.out.println("closed loop: " + ctx.getText());
+        ParserRuleContext parent = ctx.getParent();
+        if ((
+                parent instanceof ToorlaParser.OpenConditionalContext
+                        || parent instanceof ToorlaParser.StatementOpenLoopContext
+                        || parent instanceof ToorlaParser.ClosedConditionalContext
+                        || parent instanceof ToorlaParser.StatementClosedLoopContext
+        )){
+            System.out.print("nested statement{\n");
+        }
     }
 
     @Override

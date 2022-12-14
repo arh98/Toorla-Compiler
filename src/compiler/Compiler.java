@@ -9,9 +9,11 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+
+import java.io.IOException;
+
 public class Compiler {
-    public static void main(String[] args){
-        try{
+    public static void main(String[] args) throws IOException {
             CharStream stream = CharStreams.fromFileName("./sample/test3.tl");
             ToorlaLexer lexer = new ToorlaLexer(stream);
             TokenStream tokens = new CommonTokenStream(lexer);
@@ -21,10 +23,5 @@ public class Compiler {
             ParseTreeWalker walker = new ParseTreeWalker();
             ToorlaListener listener = new ProgramPrinter();
             walker.walk(listener, tree);
-        }catch (Exception e){
-            System.out.println("ERROR");
-            e.printStackTrace();
-        }
-
     }
 }
