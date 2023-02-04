@@ -9,6 +9,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import symboltable.phase2Walker;
 
 import java.io.IOException;
 
@@ -21,7 +22,9 @@ public class Compiler {
             parser.setBuildParseTree(true);
             ParseTree tree = parser.program();
             ParseTreeWalker walker = new ParseTreeWalker();
-            ToorlaListener listener = new ProgramPrinter();
+//            ToorlaListener listener = new ProgramPrinter(); phase 1
+            ToorlaListener listener = new phase2Walker();
             walker.walk(listener, tree);
+
     }
 }
